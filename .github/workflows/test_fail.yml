@@ -1,0 +1,16 @@
+name: Simulating Test Failed
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Simular Test Falla
+        run: |
+          echo "Running tests..."
+          exit 1
