@@ -1,0 +1,22 @@
+name: Trivy Vulnerability Gate
+
+on:
+  push:
+    branches: 
+      - main 
+  pull_request:
+
+jobs:
+  trivy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Run Trivy (High - CRITICAL)
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: fs
+          scan-ref: '.'
+          trivy-config: trivy.yaml
