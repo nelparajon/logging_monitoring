@@ -13,4 +13,4 @@ jobs:
       - name: Simular Test Falla
         run: |
           echo "Running tests..."
-          exit 1
+          
