@@ -1,0 +1,54 @@
+name: Security Pipeline Scan
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+  schedule:
+    - cron: '0 0 * * 0' # Domingos 00:00
+  workflow_dispatch: 
+
+jobs:
+  security-audit:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout Repo
+        uses: actions/checkout@v4
+
+      - name: Trivy
+        uses: aquasecurity/trivy-action@0.33.1
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          trivy-config: 'trivy.yaml'
+          output: 'trivy-results-${{ github.sha }}-${{ github.run_id }}.json' # HAcemos que la salida tenga tanto el hash del commit como el id del workflow
+          
+      - name: Install Bandit
+        run: pip install bandit
+  
+      - name: Run Bandit
+        run: | # -ll indica MEDIUM-HIGH SEVERITY EN BANDIT
+          bandit -r . \
+          --exclude .git-crypt,.github,secrets,trivy.yaml \
+          -ll \
+          -f json \
+          -o bandit-report-${{ github.sha }}-${{ github.run_id }}.json
+
+      - name: Upload Trivy Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: trivy-results
+          path: trivy-results-${{ github.sha }}-${{ github.run_id }}.json
+
+      - name: Upload Bandit Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bandit-report
+          path: bandit-report-${{ github.sha }}-${{ github.run_id }}.json
+        
+      
+  
