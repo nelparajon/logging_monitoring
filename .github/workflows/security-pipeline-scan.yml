@@ -39,12 +39,14 @@ jobs:
           -o bandit-report-${{ github.sha }}-${{ github.run_id }}.json
 
       - name: Upload Trivy Artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: trivy-results
           path: trivy-results-${{ github.sha }}-${{ github.run_id }}.json
 
       - name: Upload Bandit Artifact
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: bandit-report
